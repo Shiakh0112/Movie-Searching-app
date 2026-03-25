@@ -28,9 +28,15 @@ const MovieDetailPage = () => {
   }, [id]);
 
   return (
-    <div className="page movie-detail-page">
-      {loading && <div className="loading">Loading...</div>}
-      {error && <ErrorMessage message={error} />}
+    <div className="px-4">
+      {loading && (
+        <div className="flex items-center justify-center py-32">
+          <div className="w-10 h-10 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+      {error && (
+        <div className="text-center py-20 text-red-400">{error}</div>
+      )}
       {movie && <MovieDetail movie={movie} />}
     </div>
   );

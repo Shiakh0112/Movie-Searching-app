@@ -4,90 +4,98 @@ import Pagination from "./../components/Pagination";
 import MovieCard from "./../components/MovieCard";
 
 const SearchPage = () => {
-  const [query, setQuery] = useState(""); // input field
-  const [searchTerm, setSearchTerm] = useState(""); // final search query
+  const [query, setQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
 
-  // ✅ API call only when searchTerm + page change
   useEffect(() => {
     const fetchMovies = async () => {
-      if (!searchTerm.trim()) return; // agar empty hai to skip karo
-
+      if (!searchTerm.trim()) return;
       const data = await searchMovies(searchTerm, page);
       setMovies(data.Search || []);
       setTotalResults(Number(data.totalResults));
     };
-
     fetchMovies();
   }, [page, searchTerm]);
 
-  // ✅ button click handler
   const handleSearch = () => {
     if (!query.trim()) return;
-    setSearchTerm(query); // final search query set hoga
-    setPage(1); // nayi search hamesha first page
+    setSearchTerm(query);
+    setPage(1);
   };
 
   const totalPages = Math.ceil(totalResults / 10);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 bg-gradient-to-b from-gray-100 to-white">
-      {/* Title */}
-      <h1 className="text-4xl md:text-5xl font-extrabold mb-8 text-gray-900 text-center animate-fadeIn">
-        🎬 Find Your Favorite Movies & Shows
-      </h1>
+    <div className="min-h-[70vh] px-4 py-12">
+      {/* Hero */}
+      <div className="text-center mb-12">
+        <h1
+          className="text-5xl md:text-7xl font-bold mb-4 tracking-widest"
+          style={{
+            fontFamily: "'Bebas Neue', cursive",
+            background: "linear-gradient(90deg, #ff4444, #ffa500, #ff4444)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Find Your Movie
+        </h1>
+        <p className="text-gray-500 text-sm md:text-base">
+          Search millions of movies, series & episodes
+        </p>
+      </div>
 
       {/* Search Input */}
-      <div className="relative w-full max-w-2xl">
+      <div className="relative w-full max-w-2xl mx-auto mb-4">
+        <div className="absolute inset-0 rounded-full bg-red-600/10 blur-xl pointer-events-none" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for movies, series, or actors..."
-          className="w-full py-4 px-6 pr-32 rounded-full border border-gray-300 shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400 focus:border-blue-500 text-lg transition-all duration-300 placeholder-gray-400"
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          placeholder="Search movies, series, actors..."
+          className="w-full py-4 px-6 pr-36 rounded-full bg-gray-900 border border-gray-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-white placeholder-gray-600 text-base transition-all duration-300"
         />
-
         <button
           onClick={handleSearch}
-          className="absolute right-1 top-1 bottom-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full px-6 shadow-lg transition transform hover:scale-105"
+          className="absolute right-1.5 top-1.5 bottom-1.5 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 text-white font-bold rounded-full px-6 transition-all duration-200 hover:shadow-lg hover:shadow-red-900/40"
         >
           Search
         </button>
       </div>
 
-      {/* Helper Text */}
-      <p className="mt-4 text-gray-500 text-sm md:text-base text-center max-w-md">
-        Type any movie, TV series, or actor name and press search to explore
-        results.
-      </p>
+      {/* Results count */}
+      {totalResults > 0 && (
+        <p className="text-center text-gray-600 text-sm mb-8">
+          Found <span className="text-red-400 font-semibold">{totalResults}</span> results for "{searchTerm}"
+        </p>
+      )}
 
-      {/* Results */}
-      <div className="mt-10 w-full max-w-6xl">
+      {/* Results Grid */}
+      <div className="max-w-7xl mx-auto">
         {movies.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {movies.map((movie, index) => (
               <MovieCard key={`${movie.imdbID}-${index}`} movie={movie} />
             ))}
           </div>
         ) : (
           searchTerm && (
-            <p className="text-center text-gray-500 text-lg mt-10">
-              ❌ No movies found for{" "}
-              <span className="font-semibold">"{searchTerm}"</span>
-            </p>
+            <div className="text-center py-20">
+              <p className="text-5xl mb-4">🎬</p>
+              <p className="text-gray-500 text-lg">
+                No results for <span className="text-red-400 font-semibold">"{searchTerm}"</span>
+              </p>
+            </div>
           )
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
       )}
     </div>
   );
